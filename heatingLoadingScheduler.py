@@ -61,14 +61,17 @@ def setCurLoadTime(newTime, prevVal=None):
         print("")
 
     intTime = int(newTime[:2])*60 + int(newTime[3:5])
-    return execP4dCmd(f"p4 setp -a 0x3c -v {intTime}") # add CMD_TYPE_SET
+    return execP4dCmd(f"p4 setp -a 0x3c -v {intTime}", CMD_TYPE_SET)
 
 def execP4dCmd(command, cmdType=CMD_TYPE_TEST):
     if cmdType == CMD_TYPE_TEST:
         print()
         return command
 
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    inputVal = None
+    if cmdType == CMD_TYPE_SET:
+        inputVal = '\n'
+    result = subprocess.run(command, shell=True, input=inputVal, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     if result.stderr:
         print(f"\tError while executing p4d command: {result.stderr}")
